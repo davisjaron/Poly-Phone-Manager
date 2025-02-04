@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poly CCX Command Interface</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        .online { color: green; }
+        .pending { color: orange; }
+        .success { color: green; }
+        .failure { color: red; }
+        .result-table {
+            margin-top: 20px;
+            border-collapse: collapse; /* Ensure borders are collapsed */
+            width: 80%; /* Adjust width to be smaller */
+            max-width: 800px; /* Set a maximum width */
+            margin-left: auto; /* Center the table */
+            margin-right: auto; /* Center the table */
+        }
+        .result-table th, .result-table td {
+            border: 1px solid #ddd; /* Add border to cells */
+            padding: 5px; /* Reduce padding for a more compact look */
+            text-align: left; /* Align text to the left */
+            font-size: 14px; /* Reduce font size */
+        }
+        .result-table th {
+            background-color: #f2f2f2; /* Light gray background for headers */
+            font-weight: bold; /* Bold text for headers */
+        }
+        .result-table tr:nth-child(even) {
+            background-color: #f9f9f9; /* Light background for even rows */
+        }
+        .result-table tr:hover {
+            background-color: #f1f1f1; /* Highlight row on hover */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-4">Poly CCX Command Interface</h1>
+        <form id="commandForm" enctype="multipart/form-data" class="mt-4">
+            <div class="form-group">
+                <label for="inputType">Input Type:</label>
+                <div>
+                    <label class="mr-2">
+                        <input type="radio" name="inputType" value="single" checked onclick="toggleInputFields()"> Single IP Address
+                    </label>
+                    <label>
+                        <input type="radio" name="inputType" value="bulk" onclick="toggleInputFields()"> Bulk Upload
+                    </label>
+                </div>
+            </div>
+
+            <div id="singleIpField" class="form-group">
+                <label for="ip">IP Address:</label>
+                <input type="text" id="ip" name="ip" class="form-control" required>
+            </div>
+
+            <div id="bulkUploadField" class="form-group" style="display: none;">
+                <label for="bulkUpload">Bulk Upload:</label>
+                <input type="file" id="bulkUpload" name="bulkUpload" accept=".txt" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" value="Polycom" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="command">Command:</label>
+                <select id="command" name="command" class="form-control" onchange="toggleCustomCommand()">
+                    <option value="getInfo">Get Info</option>
+                    <option value="reboot">Reboot</option>
+                    <option value="factoryReset">Factory Reset</option>
+                    <option value="custom">Custom API Command</option>
+                </select>
+            </div>
+
+            <div id="customCommandField" style="display: none;">
+                <label for="customCommand">Custom API Command:</label>
+                <input type="text" id="customCommand" name="customCommand" placeholder="Enter API endpoint (e.g., mgmt/device/info)" class="form-control">
+                <label for="customMethod">HTTP Method:</label>
+                <select id="customMethod" name="customMethod" class="form-control">
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                </select>
+                <small>Enter the part of the API endpoint that comes after /api/v1/</small>
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-3">Execute Command</button>
+        </form>
+
+        <h2 class="mt-4">Results:</h2>
+        <div id="result" class="result-table"></div>
+        <div id="retryButtonContainer" style="display: none;">
+            <button id="retryButton" class="btn btn-warning" onclick="retryFailures()">Retry Failures</button>
+        </div>
+    </div>
+
+    <script>
+        let pollInterval;
+        let lastFormData; // Store the last submitted form data for retries
+
+        function toggleInputFields() {
+            const inputType = document.querySelector('input[name="inputType"]:checked').value;
+            if (inputType === 'single') {
+                document.getElementById('singleIpField').style.display = 'block';
+                document.getElementById('bulkUploadField').style.display = 'none';
+                document.getElementById('ip').required = true; // Make IP field required
+                document.getElementById('bulkUpload').required = false; // Make bulk upload not required
+            } else {
+                document.getElementById('singleIpField').style.display = 'none';
+                document.getElementById('bulkUploadField').style.display = 'block';
+                document.getElementById('ip').required = false; // Make IP field not required
+                document.getElementById('bulkUpload').required = true; // Make bulk upload required
+            }
+        }
+
+        document.getElementById('commandForm').onsubmit = function(e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+            
+            // Store the current form data for retries
+            lastFormData = new FormData(this);
+            
+            // Clear previous results
+            document.getElementById('result').innerHTML = '';
+            document.getElementById('retryButtonContainer').style.display = 'none';
+
+            fetch('/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Initial response:", data);
+                if (data.status === 'pending') {
+                    pollForResult(formData);
+                } else {
+                    updateResult(data);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                var resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = `<p class="failure">🔴 Error: ${error.message}</p>`;
+            });
+
+            // Reset form fields except username and password
+            this.reset();
+            document.getElementById('username').value = lastFormData.get('username');
+            document.getElementById('password').value = lastFormData.get('password');
+        };
+
+        function pollForResult(formData) {
+            clearInterval(pollInterval);
+            pollInterval = setInterval(() => {
+                fetch('/execute', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Poll response:", data);
+                    if (Array.isArray(data.results)) {
+                        updateBulkResult(data.results);
+                        if (data.status === 'complete') {
+                            clearInterval(pollInterval);
+                        }
+                    } else {
+                        updateSingleResult(data);
+                        if (data.status !== 'pending') {
+                            clearInterval(pollInterval);
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    clearInterval(pollInterval);
+                });
+            }, 2000); // Poll every 2 seconds
+        }
+
+        function updateBulkResult(results) {
+            var resultDiv = document.getElementById('result');
+            var table = document.getElementById('resultsTable');
+            
+            if (!table) {
+                table = document.createElement('table');
+                table.id = 'resultsTable';
+                table.innerHTML = '<tr><th>IP Address</th><th>Status</th><th>Message</th><th>Action</th></tr>';
+                resultDiv.appendChild(table);
+            }
+
+            results.forEach(result => {
+                var row = document.getElementById(`row-${result.ip}`);
+                if (row) {
+                    row.outerHTML = createTableRow(result);
+                } else {
+                    table.innerHTML += createTableRow(result);
+                }
+            });
+        }
+
+        function updateResult(data) {
+            var resultDiv = document.getElementById('result');
+            var table = '<table class="result-table"><tr><th>IP Address</th><th>Status</th><th>Message</th><th>Action</th></tr>';
+            
+            data.results.forEach(result => {
+                table += createTableRow(result);
+            });
+            
+            table += '</table>';
+            resultDiv.innerHTML = table;
+        }
+
+        function createTableRow(result) {
+            let statusClass = result.status === 'complete' ? 'success' : (result.status === 'error' ? 'failure' : 'pending');
+            let statusText = result.status === 'complete' ? 'Success' : (result.status === 'error' ? 'Failed' : 'Pending');
+            let retryButton = result.status === 'error' ? `<button class="btn btn-danger btn-sm" onclick="retryDevice('${result.ip}')"><i class="fas fa-redo"></i> Retry</button>` : '';
+            return `<tr id="row-${result.ip}">
+                <td>${result.ip}</td>
+                <td class="${statusClass}">${statusText}</td>
+                <td>${result.message}</td>
+                <td>${retryButton}</td>
+            </tr>`;
+        }
+
+        function updateSingleResult(data) {
+            let table = document.getElementById('resultsTable');
+            if (table) {
+                let row = document.getElementById(`row-${data.ip}`);
+                if (row) {
+                    row.outerHTML = createTableRow(data);
+                } else {
+                    table.innerHTML += createTableRow(data);
+                }
+            } else {
+                updateResult({ results: [data] });
+            }
+        }
+
+        function retryFailures() {
+            var formData = new FormData(document.getElementById('commandForm'));
+            formData.append('retry', 'true');
+            
+            fetch('/retry_failures', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Retry response:", data);
+                if (data.status === 'pending') {
+                    pollForResult(formData);
+                } else {
+                    updateResult(data);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                var resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = `<p class="failure">🔴 Error: ${error.message}</p>`;
+            });
+        }
+
+        function retryDevice(ip) {
+            var formData = new FormData();
+            formData.set('ip', ip);
+            formData.set('username', lastFormData.get('username'));
+            formData.set('password', lastFormData.get('password'));
+            formData.set('command', lastFormData.get('command'));
+            formData.append('retry', 'true');
+            
+            fetch('/retry_device', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Retry response:", data);
+                updateSingleResult(data);
+                if (data.status === 'pending') {
+                    pollForSingleResult(ip, formData);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                var resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = `<p class="failure">🔴 Error: ${error.message}</p>`;
+            });
+        }
+
+        function pollForSingleResult(ip, formData) {
+            clearInterval(pollInterval);
+            pollInterval = setInterval(() => {
+                fetch('/execute', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Poll response:", data);
+                    if (Array.isArray(data.results)) {
+                        let result = data.results.find(r => r.ip === ip);
+                        if (result) {
+                            updateSingleResult(result);
+                            if (result.status !== 'pending') {
+                                clearInterval(pollInterval);
+                            }
+                        }
+                    } else {
+                        updateSingleResult(data);
+                        if (data.status !== 'pending') {
+                            clearInterval(pollInterval);
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    clearInterval(pollInterval);
+                });
+            }, 5000);
+        }
+
+        function toggleCustomCommand() {
+            const commandSelect = document.getElementById('command');
+            const customCommandField = document.getElementById('customCommandField');
+            if (commandSelect.value === 'custom') {
+                customCommandField.style.display = 'block';
+            } else {
+                customCommandField.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
