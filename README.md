@@ -95,7 +95,7 @@ This tool is specifically designed for IT administrators who need to:
 5. Select desired command
 6. Monitor operation status in real-time
 
-## Linux/Mac Installation & Usage
+## Linux Installation & Usage
 
 ### Installation
 1. Install Python 3.7+ using your package manager:
@@ -111,30 +111,26 @@ This tool is specifically designed for IT administrators who need to:
    pip3 install flask requests urllib3
    ```
 
-### Running on Linux/Mac
+### Running on Linux
 1. Open terminal in project directory
 2. Run:
    ```bash
    python3 polyFactoryResetGUI.py
    ```
 3. Open browser to `http://127.0.0.1:5000`
-
-## Virtual Environment (Optional but Recommended)
-Before installing packages, you can set up a virtual environment:
-
-### Windows
-```bash
-python -m venv venv
-venv\Scripts\activate
-pip install flask requests urllib3
-```
-
-### Linux/Mac
-```bash
-python3 -m venv venv
-source venv/bin/activate
-pip install flask requests urllib3
-```
+4. Enter device credentials:
+   - Default username: Polycom
+   - Password: Your phone's admin password
+5. Choose operation mode:
+   - Single IP: Enter individual phone IP
+   - Bulk Upload: Create a text file (.txt) with one IP address per line, like:
+     ```text
+     192.168.1.100
+     192.168.1.101
+     192.168.1.102
+     ```
+6. Select desired command
+7. Monitor operation status in real-time
 
 ## Troubleshooting
 
