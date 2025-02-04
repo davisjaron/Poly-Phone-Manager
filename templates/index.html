@@ -61,6 +61,13 @@
             <div id="bulkUploadField" class="form-group" style="display: none;">
                 <label for="bulkUpload">Bulk Upload:</label>
                 <input type="file" id="bulkUpload" name="bulkUpload" accept=".txt" class="form-control">
+                <small class="form-text text-muted">
+                    Upload a text file (.txt) containing one IP address per line.<br>
+                    Example:<br>
+                    192.168.1.100<br>
+                    192.168.1.101<br>
+                    192.168.1.102
+                </small>
             </div>
 
             <div class="form-group">
@@ -339,6 +346,10 @@
                 customCommandField.style.display = 'none';
             }
         }
+    </script>
+</body>
+</html>
+
     </script>
 </body>
 </html>
