@@ -52,17 +52,6 @@ A web-based tool designed to manage and control Poly (Polycom) phones, providing
 - Real-time status display
 - Retry functionality for failed operations
 
-## Usage
-
-1. Run `startService.bat` to launch the application
-2. Access web interface through your browser (automatically opens)
-3. Enter device credentials:
-   - Default username: Polycom
-   - Password: Your phone's admin password
-4. Choose operation mode (single IP or bulk upload)
-5. Select desired command
-6. Monitor operation status in real-time
-
 ## Target Users
 This tool is specifically designed for IT administrators who need to:
 - Manage multiple Poly phones efficiently
@@ -73,60 +62,61 @@ This tool is specifically designed for IT administrators who need to:
 
 ## Requirements
 - Python 3.7 or higher
-- Flask
+- Flask, requests, urllib3 packages
 - Modern web browser
 - Network access to target Poly phones
 - Administrative credentials for the phones
 
-## Installation and Setup
+## Windows Installation & Usage
 
-### Method 1: Direct Installation
+### Installation
 1. Install Python 3.7+ from [python.org](https://www.python.org/downloads/)
-2. Install required Python packages:
-   ```bash
-   pip install flask requests urllib3
-   ```
-3. Download or clone this repository to your local machine
-
-### Method 2: Virtual Environment (Recommended)
-1. Install Python 3.7+ from [python.org](https://www.python.org/downloads/)
-2. Open a terminal/command prompt in the project directory
-3. Create a virtual environment:
-   ```bash
-   python -m venv venv
-   ```
-4. Activate the virtual environment:
-   - Windows:
-     ```bash
-     venv\Scripts\activate
-     ```
-   - Linux/Mac:
-     ```bash
-     source venv/bin/activate
-     ```
-5. Install required packages:
-   ```bash
+   - During installation, make sure to check "Add Python to PATH"
+2. Download or clone this repository
+3. Open Command Prompt (cmd) or PowerShell as administrator and run:
+   ```cmd
    pip install flask requests urllib3
    ```
 
-## Running the Application
+### Usage
+1. Double-click `startService.bat` to launch the application
+2. The web interface will automatically open in your default browser
+3. Enter device credentials:
+   - Default username: Polycom
+   - Password: Your phone's admin password
+4. Choose operation mode (single IP or bulk upload)
+5. Select desired command
+6. Monitor operation status in real-time
 
-### Windows Users
-1. Double-click `startService.bat`
-   - This will start the Flask server
-   - Open your default web browser to the application
-   - The interface will be available at `http://127.0.0.1:5000`
+## Linux Installation & Usage
 
-### Manual Start (All Platforms)
-1. Open terminal/command prompt in the project directory
-2. Activate virtual environment (if using):
-   - Windows: `venv\Scripts\activate`
-   - Linux/Mac: `source venv/bin/activate`
-3. Run the Flask application:
+### Installation
+1. Install Python 3.7+ using your package manager:
    ```bash
-   python polyFactoryResetGUI.py
+   # Ubuntu/Debian
+   sudo apt install python3
+   # Mac (using homebrew)
+   brew install python3
    ```
-4. Open your web browser and navigate to `http://127.0.0.1:5000`
+2. Download or clone this repository
+3. Install required packages:
+   ```bash
+   pip3 install flask requests urllib3
+   ```
+
+### Running on Linux
+1. Open terminal in project directory
+2. Run:
+   ```bash
+   python3 polyFactoryResetGUI.py
+   ```
+3. Open browser to `http://127.0.0.1:5000`
+4. Enter device credentials:
+   - Default username: Polycom
+   - Password: Your phone's admin password
+5. Choose operation mode (single IP or bulk upload)
+6. Select desired command
+7. Monitor operation status in real-time
 
 ## Troubleshooting
 
