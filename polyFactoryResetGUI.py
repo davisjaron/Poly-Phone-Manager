@@ -2,7 +2,7 @@
 Poly Phone Manager - A web-based tool for managing Poly (Polycom) phones
 Copyright (C) 2025 Jaron Davis
 
-Licensed under the Modified Server Side Public License
+Licensed under the Elastic License 2.0
 See LICENSE file for details.
 Contact davisjaron@pm.me for commercial licensing.
 """

@@ -168,16 +168,15 @@ Ensure proper security measures when using this tool, as it requires administrat
 
 This project is available under two licenses:
 
-1. ModifiedServer Side Public License (Modified SSPL) for free use:
+1. Elastic License 2.0 (ELv2) for free use:
    - You can freely use this software, including in business settings
-   - You must share any modifications you make
-   - You cannot offer this software as a service without a commercial license
-   - You cannot resell this software without a commercial license
+   - You can modify the software for internal use
+   - You cannot provide the software as a hosted or managed service
+   - You cannot circumvent license restrictions
 
 2. Commercial License:
    - Required for:
-     - Selling this software
-     - Offering this software as a service
+     - Offering this software as a managed service
      - Including this software in commercial products
    - Contact davisjaron@pm.me for commercial licensing
 
