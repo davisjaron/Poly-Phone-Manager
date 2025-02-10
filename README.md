@@ -162,4 +162,17 @@ If you encounter issues not covered here:
 4. Check phone firmware versions match minimum requirements
 
 ## Security Note
-Ensure proper security measures when using this tool, as it requires administrative access to phone systems. 
+Ensure proper security measures when using this tool, as it requires administrative access to phone systems.
+
+## License
+
+This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). This means:
+
+- You can use, modify, and distribute this software
+- If you modify and use this software in a network service, you must:
+  - Make your modified source code available to users of that service
+  - Include the original copyright notice
+  - State significant changes made to the software
+  - Provide a way to obtain the source code
+
+See the [LICENSE](LICENSE) file for the full license text. 
