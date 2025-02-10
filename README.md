@@ -179,6 +179,6 @@ This project is available under two licenses:
      - Selling this software
      - Offering this software as a service
      - Including this software in commercial products
-   - Contact jaron@davisjaron.com for commercial licensing
+   - Contact davisjaron@pm.me for commercial licensing
 
 For full license terms, see the [LICENSE](LICENSE) file. 
