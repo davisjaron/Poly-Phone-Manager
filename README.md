@@ -166,13 +166,19 @@ Ensure proper security measures when using this tool, as it requires administrat
 
 ## License
 
-This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). This means:
+This project is available under two licenses:
 
-- You can use, modify, and distribute this software
-- If you modify and use this software in a network service, you must:
-  - Make your modified source code available to users of that service
-  - Include the original copyright notice
-  - State significant changes made to the software
-  - Provide a way to obtain the source code
+1. ModifiedServer Side Public License (Modified SSPL) for free use:
+   - You can freely use this software, including in business settings
+   - You must share any modifications you make
+   - You cannot offer this software as a service without a commercial license
+   - You cannot resell this software without a commercial license
 
-See the [LICENSE](LICENSE) file for the full license text. 
+2. Commercial License:
+   - Required for:
+     - Selling this software
+     - Offering this software as a service
+     - Including this software in commercial products
+   - Contact jaron@davisjaron.com for commercial licensing
+
+For full license terms, see the [LICENSE](LICENSE) file. 
